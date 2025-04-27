@@ -10,12 +10,12 @@ describe('DeployAContract', () => {
 
   before(async () => {
     [attacker, deployer] = await ethers.getSigners();
+    const TargetFfactory = await ethers.getContractFactory('DeployChallenge', deployer);
+    target = await TargetFfactory.deploy();
+    await target.deployed();
   });
 
   it('exploit', async () => {
-    /**
-     * YOUR CODE HERE
-     * */
 
     expect(await target.isComplete()).to.equal(true);
   });
