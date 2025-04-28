@@ -24,9 +24,21 @@ describe('GuessTheSecretNumberChallenge', () => {
   });
 
   it('exploit', async () => {
-    /**
-     * YOUR CODE HERE
-     * */
+    const secretHash = await ethers.provider.getStorageAt(target.address, 0);
+
+    let guessNumber = -1;
+
+    for (let i = 0; i <= 255; i++) {
+      const packed = ethers.utils.solidityPack(["uint8"], [i]);
+      const hash = ethers.utils.keccak256(packed);
+
+      if (hash == secretHash) {
+        guessNumber = i;
+        break;
+      }
+    }
+
+    await target.connect(attacker).guess(guessNumber, {value: ethers.utils.parseEther("1")});
 
     expect(await target.isComplete()).to.equal(true);
   });

